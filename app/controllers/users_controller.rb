@@ -46,14 +46,17 @@ class UsersController < ApplicationController
     
     # beforeアクション
     
+    # ログイン済みユーザーか確認
     def logged_in_user
       #if not logged_in? 以下と同義
       unless logged_in?
+        store_location
         flash[:warning] = "ログインしてください。"
         redirect_to login_url
       end
     end
     
+    # 正しいユーザーか確認
     def correct_user
       @user = User.find(params[:id])
       redirect_to (root_url) unless current_user?(@user)  #current_user?()はSessionsHelperで定義

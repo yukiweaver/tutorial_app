@@ -34,5 +34,16 @@ module SessionsHelper
     user == current_user
   end
   
+  def redirect_back_or(default)
+    redirect_to(session[:fowarding_url] || default)
+    session.delete(:fowarding_url)
+  end
+  
+  # アクセスしようとしたURLを記憶
+  # getリクエストのみ記憶
+  def store_location
+    session[:fowarding_url] = request.original_url if request.get?
+  end
+  
   
 end
