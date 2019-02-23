@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :logged_in_user, only: [:edit, :update]
+  before_action :correct_user, only: [:edit, :update]
   
   # 新規登録ページ
   def new
@@ -23,12 +25,37 @@ class UsersController < ApplicationController
   end
   
   def edit
-    @user = User.find(params[:id])
+    # correct_userが先に実行されるため、@user定義なし
+  end
+  
+  def update
+    # correct_userが先に実行されるため、@user定義なし
+    if @user.update_attributes(user_params)
+      flash[:success] = "更新しました。"
+      redirect_to @user
+    else
+      render 'edit'
+    end
   end
   
   private
   
     def user_params
       params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
+    
+    # beforeアクション
+    
+    def logged_in_user
+      #if not logged_in? 以下と同義
+      unless logged_in?
+        flash[:warning] = "ログインしてください。"
+        redirect_to login_url
+      end
+    end
+    
+    def correct_user
+      @user = User.find(params[:id])
+      redirect_to (root_url) unless current_user?(@user)  #current_user?()はSessionsHelperで定義
     end
 end
