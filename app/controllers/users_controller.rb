@@ -15,8 +15,22 @@ class UsersController < ApplicationController
   # 勤怠表示ページ
   def show
     @user = User.find(params[:id])
-    @first_day = Date.today.beginning_of_month
+    
+    if params[:first_day].nil?
+      @first_day = Date.today.beginning_of_month
+    else
+      @first_day = Date.parse(params[:first_day])
+    end
+    
     @last_day = @first_day.end_of_month
+    
+    (@first_day..@last_day).each do |day|
+      unless @user.attendances.any? {|attendance| attendance.worked_on == day}
+        record = @user.attendances.build(worked_on: day)
+        record.save
+      end
+    end
+    @dates = @user.attendances.where('worked_on>=? and worked_on<=?', @first_day, @last_day).order('worked_on')
   end
   
   # 新規登録→ログイン状態へ

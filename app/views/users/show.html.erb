@@ -2,17 +2,21 @@
 <div>
   <table class="table-bordered table-condensed">
     <tr>
-      <td>時間管理表</td>
+      <td>
+        <%= link_to "←", user_path(params: {id: @user.id, first_day: @first_day.prev_month}), class: "btn btn-xs btn-primary" %>
+        &emsp;<%= @first_day.to_s(:year_month) %> 時間管理表&emsp;
+        <%= link_to "→", user_path(params: {id: @user.id, first_day: @first_day.next_month}), class: "btn btn-xs btn-primary" %>
+      </td>
       <td>指定勤務時間：<%= format_basic_time(@user.work_time) %></td>
       <td>基本時間：<%= format_basic_time(@user.basic_time) %></td>
-      <td>月の初日</td>
+      <td>初日 <%= @first_day.to_s(:date) %></td>
     </tr>
     
     <tr>
       <td>所属：<%=@user.department.present? ? @user.department : "未設定" %></td>
       <td>氏名：<%= @user.name %></td>
       <td>出勤日数</td>
-      <td>月の末日</td>
+      <td>末日 <%= @last_day.to_s(:date) %></td>
     </tr>
   </table>
 </div>
@@ -40,10 +44,10 @@
   </thead>
   
   <tbody>
-    <% (@first_day..@last_day).each do |day| %>
+    <% @dates.each do |day| %>
       <tr>
-        <td><%= day.to_s(:date) %></td>
-        <td><%= %w{日 月 火 水 木 金 土 日}[day.wday] %></td>
+        <td><%= day.worked_on.to_s(:date) %></td>
+        <td><%= %w{日 月 火 水 木 金 土 日}[day.worked_on.wday] %></td>
         <td></td>
         <td></td>
         <td></td>
