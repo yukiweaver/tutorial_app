@@ -15,7 +15,7 @@
     <tr>
       <td>所属：<%=@user.department.present? ? @user.department : "未設定" %></td>
       <td>氏名：<%= @user.name %></td>
-      <td>出勤日数</td>
+      <td>出勤日数：<%= @work_sum %>日</td>
       <td>末日 <%= @last_day.to_s(:date) %></td>
     </tr>
   </table>
@@ -43,20 +43,45 @@
     </tr>
   </thead>
   
+  <!-- データ部分 -->
   <tbody>
     <% @dates.each do |day| %>
       <tr>
         <td><%= day.worked_on.to_s(:date) %></td>
         <td><%= %w{日 月 火 水 木 金 土 日}[day.worked_on.wday] %></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td><%= day.started_at.to_s(:hour) if day.started_at.present? %></td>
+        <td><%= day.started_at.to_s(:min) if day.started_at.present? %></td>
+        <td>
+          <% if day.worked_on == Date.today && day.started_at.nil? %>
+            <%= button_to "出社", user_attendances_path(@user), class: "btn btn-xs btn-primary" %>
+          <% end %>
+        </td>
+        <td><%= day.finished_at.to_s(:hour) if day.finished_at.present? %></td>
+        <td><%= day.finished_at.to_s(:min) if day.finished_at.present? %></td>
+        <td>
+          <% if day.worked_on == Date.today && day.started_at.present? && day.finished_at.nil? %>
+            <%= button_to "退勤", user_attendances_path(@user), class: "btn btn-xs btn-primary" %>
+          <% end %>
+        </td>
+        <td>
+          <% if day.started_at.present? && day.finished_at.present? %>
+            <%= working_times(day.started_at, day.finished_at) %>  <!-- working_timesはAttendancesHelper -->
+            <% seconds = (day.finished_at - day.started_at).to_i %>
+            <% @total_seconds = @total_seconds.to_i + seconds %>
+          <% end %>
+        </td>
         <td></td>
       </tr>
     <% end %>
   </tbody>
+  
+  <!-- フッター部分 -->
+  <tfoot>
+    <tr>
+      <td colspan="2">総合勤務時間 <%= format_basic_time(@user.basic_time).to_f * @work_sum %></td> <!-- format_basic_timeはUsersHelper -->
+      <td colspan="6"></td>
+      <td>在社時間合計 <%= working_times_sum(@total_seconds) unless @total_seconds.nil? %></td>
+      <td></td>
+    </tr>
+  </tfoot>
 </table>
