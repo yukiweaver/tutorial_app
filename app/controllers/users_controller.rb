@@ -31,7 +31,7 @@ class UsersController < ApplicationController
       end
     end
     @dates = @user.attendances.where('worked_on >= ? and worked_on <= ?', @first_day, @last_day).order('worked_on')
-    @work_sum = @dates.where.not(started_at: !nil).count
+    @work_sum = @dates.where.not(started_at: nil).count
   end
   
   # 新規登録→ログイン状態へ
