@@ -18,6 +18,10 @@ group :development, :test do
   gem 'sqlite3', '1.3.13'
   gem 'byebug',  '9.0.6', platform: :mri
   gem 'pry-rails'
+  gem 'rspec-rails', '~> 3.6'
+  gem 'capybara', '~> 2.8'
+  gem 'selenium-webdriver'
+  gem 'webdrivers'
 end
 
 group :development do
